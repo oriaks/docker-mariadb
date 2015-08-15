@@ -26,7 +26,7 @@ _install () {
 
   apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
   cat > /etc/apt/sources.list.d/mariadb.list <<- EOF
-	deb http://mariadb.mirror.iweb.com/repo/10.0/debian jessie main
+	deb http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.0/debian jessie main
 EOF
 
   apt-get update -q
