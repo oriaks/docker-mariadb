@@ -36,6 +36,8 @@ EOF
 	s|bind-address.*$|bind-address = 0.0.0.0|;
 EOF
 
+  rm -rf /var/lib/mysql/*
+
   return
 }
 
