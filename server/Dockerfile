@@ -7,5 +7,5 @@ EXPOSE 3306/tcp
 COPY entrypoint.sh /entrypoint.sh
 RUN /entrypoint.sh install
 
-ENTRYPOINT /entrypoint.sh
-CMD init
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["init"]
