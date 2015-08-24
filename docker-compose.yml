@@ -1,5 +1,5 @@
 data:
-  build: data
+  image: tianon/true
   container_name: mariadb_data
   volumes:
     - /var/lib/mysql
