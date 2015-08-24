@@ -145,7 +145,7 @@ _manage_db_edit () {
 }
 
 _shell () {
-  exec /bin/bash
+  exec /usr/bin/clish
 
   return
 }
