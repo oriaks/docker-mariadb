@@ -16,7 +16,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#set -x
+if [ -n "${DEBUG}" ]; then
+  set -x
+fi
 
 export DEBIAN_FRONTEND='noninteractive'
 export TERM='linux'
