@@ -76,51 +76,16 @@ EOF
   return
 }
 
-_manage () {
-  _CMD="$1"
-  [ -n "${_CMD}" ] && shift
-
-  case "${_CMD}" in
-    "db")
-      _manage_db $*
-      ;;
-    *)
-      _usage
-      ;;
-  esac
-
-  return 0
-}
-
-_manage_db () {
-  _CMD="$1"
-  [ -n "${_CMD}" ] && shift
-
-  case "${_CMD}" in
-    "create")
-      _manage_db_create $*
-      ;;
-    "edit")
-      _manage_db_edit $*
-      ;;
-    *)
-      _usage
-      ;;
-  esac
-
-  return 0
-}
-
-_manage_db_create () {
-  _DB="$1"
+_db_create () {
+  local _DB="$1"
   [ -z "${_DB}" ] && return 1 || shift
-  [ `mysql -sN -e "SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${_DB}'"` -ge 1 ] && return 1
+  _db_exists && return 1
 
-  _USER="$1"
+  local _USER="$1"
   [ -z "${_USER}" ] && _USER="${_DB}" || shift
-  [ `mysql -sN -e "SELECT COUNT(*) FROM mysql.user WHERE user='${_USER}'"` -ge 1 ] && return 1
+  _db_user_exists && return 1
 
-  _PASSWORD="$1"
+  local _PASSWORD="$1"
   [ -z "${_PASSWORD}" ] && _PASSWORD=`pwgen 12 1` || shift
 
   mysql <<- EOF
@@ -136,51 +101,58 @@ EOF
   return 0
 }
 
-_manage_db_edit () {
-  _DB="$1"
+_db_edit () {
+  local _DB="$1"
   [ -z "${_DB}" ] && return 1 || shift
-  [ `mysql -sN -e "SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${_DB}'"` -ge 1 ] || return 1
+  _db_exists "${_DB}" || return 1
 
   mysql "${_DB}"
 
   return 0
 }
 
-_shell () {
-  exec /usr/bin/clish
+_db_exists () {
+  local _DB="$1"
+  [ -z "${_DB}" ] && return 1 || shift
+  [ `mysql -sN -e "SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${_DB}'"` -ge 1 ] || return 1
 
-  return
+  return 0
 }
 
-_usage () {
-  cat <<- EOF
-	Usage: $0 install
-	       $0 init
-	       $0 manage db create <database_name> [ <user_name> [ <password> ]]
-	       $0 manage db edit <database_name>
-	       $0 shell
-EOF
+_db_list () {
+  local _DB
 
-  return
+  for _DB in `mysql -Bse 'show databases;' | sort`; do
+    [ "${_DB}" = 'information_schema' ] && continue 
+    [ "${_DB}" = 'mysql' ] && continue
+    [ "${_DB}" = 'performance_schema' ] && continue
+
+    printf "${_DB}\n"
+  done
 }
 
-_CMD="$1"
-[ -n "${_CMD}" ] && shift
+_db_user_exists () {
+  local _USER="$1"
+  [ -z "${_USER}" ] && _USER="${_DB}" || shift
+  [ `mysql -sN -e "SELECT COUNT(*) FROM mysql.user WHERE user='${_USER}'"` -ge 1 ] || return 1
 
-case "${_CMD}" in
+  return 0
+}
+
+case "$1" in
   "install")
-    _install $*
+    _$*
     ;;
   "init")
-    _init $*
+    _$*
     ;;
-  "manage")
-    _manage $*
+  "")
+    /usr/bin/clish
     ;;
-  "shell")
-    _shell $*
+  _*)
+    $*
     ;;
   *)
-    _usage
+    /usr/bin/clish -c "$*"
     ;;
 esac

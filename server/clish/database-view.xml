@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CLISH_MODULE xmlns="http://clish.sourceforge.net/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://clish.sourceforge.net/XMLSchema http://clish.sourceforge.net/XMLSchema/clish.xsd">
+  <VIEW name="database" prompt="database&gt; ">
+    <COMMAND name=".." help="Return to the previous view" view="root-view" />
+    <COMMAND name="create" help="Create a new database">
+      <PARAM name="db" help="Database name" ptype="STRING" />
+      <PARAM name="user" help="User Name" ptype="STRING" optional="true" />
+      <PARAM name="password" help="User password" ptype="STRING" optional="true" />
+      <ACTION>/entrypoint.sh _db_create "${db}" "${user}" "${password}"</ACTION>
+    </COMMAND>
+    <COMMAND name="edit" help="Edit an existing database">
+      <PARAM name="db" help="Name of the database" ptype="STRING" />
+      <ACTION>/entrypoint.sh _db_edit "${db}"</ACTION>
+    </COMMAND>
+    <COMMAND name="list" help="List all databases">
+      <ACTION>/entrypoint.sh _db_list</ACTION>
+    </COMMAND>
+  </VIEW>
+</CLISH_MODULE>
