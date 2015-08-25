@@ -79,11 +79,11 @@ EOF
 _db_create () {
   local _DB="$1"
   [ -z "${_DB}" ] && return 1 || shift
-  _db_exists && return 1
+  _db_exists "${_DB}" && return 1
 
   local _USER="$1"
   [ -z "${_USER}" ] && _USER="${_DB}" || shift
-  _db_user_exists && return 1
+  _db_user_exists "${_USER}" && return 1
 
   local _PASSWORD="$1"
   [ -z "${_PASSWORD}" ] && _PASSWORD=`pwgen 12 1` || shift
@@ -133,7 +133,7 @@ _db_list () {
 
 _db_user_exists () {
   local _USER="$1"
-  [ -z "${_USER}" ] && _USER="${_DB}" || shift
+  [ -z "${_USER}" ] && return 1 || shift
   [ `mysql -sN -e "SELECT COUNT(*) FROM mysql.user WHERE user='${_USER}'"` -ge 1 ] || return 1
 
   return 0
